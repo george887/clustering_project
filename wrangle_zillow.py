@@ -69,6 +69,14 @@ def get_zillow_data(cached=False):
 
 #################### Prepare ##################
 
+def fips_labels(x):
+    if x['fips'] == 6037:
+        return 'Los Angeles County'
+    elif x['fips'] == 6059:
+        return 'Orange County'
+    elif x['fips'] == 6111:
+        return 'Ventura County'
+
 def single_unit_properties(df):
     '''This function will filter single unit properties, fillna's, drop unwanted columns, and replace features
     '''
@@ -183,3 +191,27 @@ def X_train_select(train, validate, test, target_var):
 
     # How to call function X_train, y_train, X_validate, y_validate, X_test, y_test = X_train_select(train, validate, test, target_var = 'logerror')
 
+def add_scaled_columns(X_train, X_validate, X_test, scaler, columns_to_scale):
+    """This function will add scaled columns to X_train_scaled, X_validate_scaled, and X_test_scaled"""
+    new_column_names = [c + '_scaled' for c in columns_to_scale]
+    scaler.fit(X_train[columns_to_scale])
+
+    X_train_scaled = pd.concat([
+        X_train,
+        pd.DataFrame(scaler.transform(X_train[columns_to_scale]), columns=new_column_names, index=X_train.index),
+    ], axis=1)
+    X_validate_scaled = pd.concat([
+        X_validate,
+        pd.DataFrame(scaler.transform(X_validate[columns_to_scale]), columns=new_column_names, index=X_validate.index),
+    ], axis=1)
+    X_test_scaled = pd.concat([
+        X_test,
+        pd.DataFrame(scaler.transform(X_test[columns_to_scale]), columns=new_column_names, index=X_test.index),
+    ], axis=1)
+    
+    return X_train_scaled, X_validate_scaled, X_test_scaled
+
+    # How to call function
+    # scaler = StandardScaler() or whatever scaler wanting to use. 
+    # columns_to_scale = train.drop(columns=["logerror",'propertycountylandusecode','transactiondate','heatingorsystemdesc']).columns.tolist()
+    # X_train_scaled, X_validate_scaled, X_test_scaled = add_scaled_columns(X_train, X_validate, X_test, scaler, columns_to_scale)
