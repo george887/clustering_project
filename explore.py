@@ -105,3 +105,49 @@ def add_to_train(X_train, train_clusters, X_train_scaled, centroids, cluster_col
                             set_index(X_train.index)
     
     return X_train, X_train_scaled
+
+def rfe_ranker(train):
+    '''
+    Uses Recursive Feature Elimination (RFE) to rank the given features in order of their usefulness in
+    predicting logerror with a linear regression model.
+    '''
+    # creating linear regression object
+    lm = LinearRegression()
+
+    # fitting linear regression model to features 
+    lm.fit(train.drop(columns=['bathroomcnt','fullbathcnt','bedroomcnt','unitcnt','taxrate', 'logerror','propertycountylandusecode','heatingorsystemdesc', 'binned_price_per_sqft', 'binned_bed_bath_ratio', 'transactiondate']), train['logerror'])
+
+    # creating recursive feature elimination object and specifying to rank 5 of the best features
+    rfe = RFE(lm, 5)
+
+    # using rfe object to transform features 
+    x_rfe = rfe.fit_transform(train.drop(columns=['bathroomcnt','fullbathcnt','bedroomcnt','unitcnt','taxrate', 'logerror','propertycountylandusecode','heatingorsystemdesc', 'binned_price_per_sqft', 'binned_bed_bath_ratio','transactiondate']), train['logerror'])
+
+    feature_mask = rfe.support_
+
+    # creating train df for rfe object 
+    rfe_train = train.drop(columns=['bathroomcnt','fullbathcnt','bedroomcnt','unitcnt','taxrate', 'logerror','propertycountylandusecode','heatingorsystemdesc', 'binned_price_per_sqft', 'binned_bed_bath_ratio', 'transactiondate'])
+
+    # creating list of the top features per rfe
+    rfe_features = rfe_train.loc[:,feature_mask].columns.tolist()
+
+    # creating ranked list 
+    feature_ranks = rfe.ranking_
+
+    # creating list of feature names
+    feature_names = rfe_train.columns.tolist()
+
+    # create df that contains all features and their ranks
+    rfe_ranks_df = pd.DataFrame({'Feature': feature_names, 'Rank': feature_ranks})
+
+    # return df sorted by rank
+    return rfe_ranks_df.sort_values('Rank')
+
+    def kmeans_transform(X_scaled, kmeans, cluster_vars, cluster_col_name):
+    kmeans.transform(X_scaled[cluster_vars])
+    trans_clusters = \
+        pd.DataFrame(kmeans.predict(X_scaled[cluster_vars]),
+                              columns=[cluster_col_name],
+                              index=X_scaled.index)
+    
+    return trans_clusters
