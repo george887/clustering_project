@@ -40,10 +40,10 @@ For this project some filters were applied to help limit for only single unit pr
 - Functions for KMeans, centroids, adding clusters/centroids to data frames and RFE ranker
 
 ## Initial Thoughts
-    - Is there a relationship between price_per_sqft and logerror?
-    - Is there a relationship between bed_bath_ratio and logerror?
-    - Is there a relationship between lot size per sqft and logerror?
-    - Is there a relationship between lot size per sqft and price per sqft?
+1. Is there a relationship between price_per_sqft and logerror?
+2. Is there a relationship between bed_bath_ratio and logerror?
+3. Is there a relationship between lot size per sqft and logerror?
+4. Is there a relationship between lot size per sqft and price per sqft?
 
 ## Hypothesis Testing
 > H<sub>0</sub>: Means of price_per_sqft_ratio small, medium, large are equal
@@ -79,4 +79,22 @@ For this project some filters were applied to help limit for only single unit pr
 | county | Fips value converted to actual county | | object |
 | age | Age of property | float64 | 
 
+## Conclusions
+- ANNOVA tests were ran on price per square feet and logerror & bed bath ratio and logerror
+- Means were differnent in both test so the Ho was rejected
+- Clusters were created comparing building quality type id & bed bath ratio, price per sqft & age, and price per sqft and lot size per sqft
+- Dummy variables were created with clusters of price per sqft and lot size per sqft
+- Modeling was performed with scaled data along with the cluster dummies
+- The best model (Lassolars) did out perform the baseline RMSE 0.17374 on train and validate but did not on test 0.18188
+- Further testing needs to be done to see how different features can help reduce the RMSE of logerror
+- Look further into the relationship of binned bed bath ratio and logerror
+- Create dummy variables with price per sqft and age to model
+
+## How to reproduce
+
+- Have access to the Codeup SQL data base
+- Have credential in env.py file to establish a connection with the server
+- Use wrangle.py file for data acquisition and data preperation
+- Use explore.py file to explore
+- Look at MVP_walkthru.ipynb to see analysis done
 
