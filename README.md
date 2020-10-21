@@ -7,7 +7,9 @@ The goal of this project is to predict what is causing more and less logerror us
 - A [single-unit property](https://help.rentingwell.com/article/multi-unit-vs-single-unit/) is a rental property that is rented as a single entity. A condo, a townhouse, or a vacation rental would typically be single-unit properties. If you’re adding a single-unit property to Renting Well you don’t need to add individual units – the tenant and lease are associated to the property itself.
 - [FIPS](https://transition.fcc.gov/oet/info/maps/census/fips/fips.txt#:~:text=FIPS%20codes%20are%20numbers%20which,to%20which%20the%20county%20belongs.) codes are numbers which uniquely identify geographic areas. The number of digits in FIPS codes vary depending on the level of geography. State-level FIPS codes have two digits, county-level FIPS codes have five digits of which the first two are the FIPS code of the state to which the county belongs.
 
-## Data preparation
+# Project Planning
+
+## Data Preparation
 For this project some filters were applied to help limit for only single unit properties, outliers and null values. 
 - Propertylandusetypeid = [260,261,262,279]
 - Bedroomcnt > 0 and < 6
@@ -18,10 +20,43 @@ For this project some filters were applied to help limit for only single unit pr
 - Required columns and rows set at 60%. Anything below was dropped
 - Categorical variables with an acceptable amount of nulls missing replaced with the mode
 - Continuous variables with an acceptable amount of nulls missing replaced with the median
+- age = 2017 - df.yearbuilt
+- taxrate = taxamount / dtaxvaluedollarcnt
+- acres = lotsizesquarefeet / 43560
+- price_per_sqft = taxvaluedollarcnt / calculatedfinishedsquarefeet
+- lotsize_per_sqft =  taxvaluedollarcnt / lotsizesquarefeet
+- bed_bath_ratio = bedroomcnt / bathroomcnt
+
+## Wrangle
+- Created a wrangle.py 
+- File contains functions to acquire and prepare the zillow data from the Codeup SQL server
+- Icludes the filters from data prepartion above
+- Handles and imputes missing values 
+- Data split into train, validate, test, X_train, y_train, X_validate, y_validate, X_test, y_test
+
+## Explore
+- Created an explore.py file
+- File contains functions to help create plots
+- Functions for KMeans, centroids, adding clusters/centroids to data frames and RFE ranker
+
+## Initial Thoughts
+    - Is there a relationship between price_per_sqft and logerror?
+    - Is there a relationship between bed_bath_ratio and logerror?
+    - Is there a relationship between lot size per sqft and logerror?
+    - Is there a relationship between lot size per sqft and price per sqft?
+
+## Hypothesis Testing
+> H<sub>0</sub>: Means of price_per_sqft_ratio small, medium, large are equal
+
+> H<sub>a</sub>: Means of price_per_sqft_ratio small, medium, large are not equal
+
+> H<sub>0</sub>: Means of bed_bath_ratio small, medium, large are equal
+
+> H<sub>a</sub>: Means of bed_bath_ratio small, medium, large are not equal
 
 ## Data Dictionary
 | Column | Description | Data Type |
-| --- | ---|
+| --- | ---| --- |
 | bathroomcnt | Number of bathrooms including fractional bathrooms | float64 |
 | bedroomcnt | Number of bedrooms | float64 |
 | buildingqualitytypeid | Assessment of condition of home from best (lowest) to worst (highest) | float64 |
@@ -43,3 +78,5 @@ For this project some filters were applied to help limit for only single unit pr
 | heatingorsystemdesc | Type of heating system in home | object |
 | county | Fips value converted to actual county | | object |
 | age | Age of property | float64 | 
+
+

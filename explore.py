@@ -87,7 +87,7 @@ def get_centroids(kmeans, cluster_vars, cluster_col_name):
 # centroids = get_centroids(kmeans, cluster_vars, cluster_col_name)
 
 def add_to_train(X_train, train_clusters, X_train_scaled, centroids, cluster_col_name):
-    '''Adds the 
+    '''Merges clusters and centroids to data frames
     '''
     # concatenate cluster id
     X_train = pd.concat([X_train, train_clusters], axis=1)
@@ -117,18 +117,18 @@ def rfe_ranker(train):
     lm = LinearRegression()
 
     # fitting linear regression model to features 
-    lm.fit(train.drop(columns=['county','bathroomcnt','fullbathcnt','bedroomcnt','unitcnt','taxrate', 'logerror','propertycountylandusecode','heatingorsystemdesc', 'binned_price_per_sqft', 'binned_bed_bath_ratio', 'transactiondate']), train['logerror'])
+    lm.fit(train.drop(columns=['bathroomcnt','fullbathcnt','bedroomcnt','unitcnt','taxrate', 'logerror','propertycountylandusecode','heatingorsystemdesc', 'binned_price_per_sqft', 'binned_bed_bath_ratio', 'transactiondate']), train['logerror'])
 
     # creating recursive feature elimination object and specifying to rank 5 of the best features
     rfe = RFE(lm, 5)
 
     # using rfe object to transform features 
-    x_rfe = rfe.fit_transform(train.drop(columns=['county','bathroomcnt','fullbathcnt','bedroomcnt','unitcnt','taxrate', 'logerror','propertycountylandusecode','heatingorsystemdesc', 'binned_price_per_sqft', 'binned_bed_bath_ratio','transactiondate']), train['logerror'])
+    x_rfe = rfe.fit_transform(train.drop(columns=['bathroomcnt','fullbathcnt','bedroomcnt','unitcnt','taxrate', 'logerror','propertycountylandusecode','heatingorsystemdesc', 'binned_price_per_sqft', 'binned_bed_bath_ratio','transactiondate']), train['logerror'])
 
     feature_mask = rfe.support_
 
     # creating train df for rfe object 
-    rfe_train = train.drop(columns=['county','bathroomcnt','fullbathcnt','bedroomcnt','unitcnt','taxrate', 'logerror','propertycountylandusecode','heatingorsystemdesc', 'binned_price_per_sqft', 'binned_bed_bath_ratio', 'transactiondate'])
+    rfe_train = train.drop(columns=['bathroomcnt','fullbathcnt','bedroomcnt','unitcnt','taxrate', 'logerror','propertycountylandusecode','heatingorsystemdesc', 'binned_price_per_sqft', 'binned_bed_bath_ratio', 'transactiondate'])
 
     # creating list of the top features per rfe
     rfe_features = rfe_train.loc[:,feature_mask].columns.tolist()
