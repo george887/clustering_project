@@ -69,13 +69,17 @@ def get_zillow_data(cached=False):
 
 #################### Prepare ##################
 
-def fips_labels(x):
-    if x['fips'] == 6037:
+def fips_labels(row):
+    if row['fips'] == 6037:
         return 'Los Angeles County'
-    elif x['fips'] == 6059:
+    elif row['fips'] == 6059:
         return 'Orange County'
-    elif x['fips'] == 6111:
+    elif row['fips'] == 6111:
         return 'Ventura County'
+        
+def add_fips(df):
+    df['fips'] = df.apply(lambda row: fips_labels(row), axis=1)
+    return df
 
 def single_unit_properties(df):
     '''This function will filter single unit properties, fillna's, drop unwanted columns, and replace features
