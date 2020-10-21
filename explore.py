@@ -5,6 +5,8 @@ import seaborn as sns
 import scipy.stats
 import os
 from sklearn.cluster import KMeans
+from sklearn.linear_model import LinearRegression
+from sklearn.feature_selection import RFE
 
 # Plots a pairgrid, distplot and regplot
 def plot_variable_pairs(df):
@@ -115,18 +117,18 @@ def rfe_ranker(train):
     lm = LinearRegression()
 
     # fitting linear regression model to features 
-    lm.fit(train.drop(columns=['bathroomcnt','fullbathcnt','bedroomcnt','unitcnt','taxrate', 'logerror','propertycountylandusecode','heatingorsystemdesc', 'binned_price_per_sqft', 'binned_bed_bath_ratio', 'transactiondate']), train['logerror'])
+    lm.fit(train.drop(columns=['county','bathroomcnt','fullbathcnt','bedroomcnt','unitcnt','taxrate', 'logerror','propertycountylandusecode','heatingorsystemdesc', 'binned_price_per_sqft', 'binned_bed_bath_ratio', 'transactiondate']), train['logerror'])
 
     # creating recursive feature elimination object and specifying to rank 5 of the best features
     rfe = RFE(lm, 5)
 
     # using rfe object to transform features 
-    x_rfe = rfe.fit_transform(train.drop(columns=['bathroomcnt','fullbathcnt','bedroomcnt','unitcnt','taxrate', 'logerror','propertycountylandusecode','heatingorsystemdesc', 'binned_price_per_sqft', 'binned_bed_bath_ratio','transactiondate']), train['logerror'])
+    x_rfe = rfe.fit_transform(train.drop(columns=['county','bathroomcnt','fullbathcnt','bedroomcnt','unitcnt','taxrate', 'logerror','propertycountylandusecode','heatingorsystemdesc', 'binned_price_per_sqft', 'binned_bed_bath_ratio','transactiondate']), train['logerror'])
 
     feature_mask = rfe.support_
 
     # creating train df for rfe object 
-    rfe_train = train.drop(columns=['bathroomcnt','fullbathcnt','bedroomcnt','unitcnt','taxrate', 'logerror','propertycountylandusecode','heatingorsystemdesc', 'binned_price_per_sqft', 'binned_bed_bath_ratio', 'transactiondate'])
+    rfe_train = train.drop(columns=['county','bathroomcnt','fullbathcnt','bedroomcnt','unitcnt','taxrate', 'logerror','propertycountylandusecode','heatingorsystemdesc', 'binned_price_per_sqft', 'binned_bed_bath_ratio', 'transactiondate'])
 
     # creating list of the top features per rfe
     rfe_features = rfe_train.loc[:,feature_mask].columns.tolist()
@@ -143,11 +145,11 @@ def rfe_ranker(train):
     # return df sorted by rank
     return rfe_ranks_df.sort_values('Rank')
 
-    def kmeans_transform(X_scaled, kmeans, cluster_vars, cluster_col_name):
+def kmeans_transform(X_scaled, kmeans, cluster_vars, cluster_col_name):
     kmeans.transform(X_scaled[cluster_vars])
     trans_clusters = \
         pd.DataFrame(kmeans.predict(X_scaled[cluster_vars]),
-                              columns=[cluster_col_name],
-                              index=X_scaled.index)
+                            columns=[cluster_col_name],
+                            index=X_scaled.index)
     
     return trans_clusters
